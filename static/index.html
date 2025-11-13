@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Uvas API – Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+        --gap:20px;
+        --radius:16px;
+        --bg-primary: #0a0e1a; 
+        --bg-secondary: #161e2f;
+        --border-color: #2f3a52; 
+        --text-color: #e0e6f2; 
+        --text-muted: #a0aec0; 
+        --accent-blue: #3b82f6; 
+        --accent-blue-dark: #2563eb;
+        --success-green: #10b981;
+        --warning-orange: #f59e0b;
+        --error-red: #ef4444;
+    }
+    body{
+        font-family: 'Inter', system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+        margin:0;
+        background:var(--bg-primary);
+        color:var(--text-color);
+        line-height:1.6;
+    }
+    header{
+        padding:20px var(--gap);
+        border-bottom:1px solid var(--border-color);
+        background:var(--bg-secondary);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    h1, h3{margin-top:0; color: var(--text-color);}
+    main{
+        max-width:1100px;
+        margin:0 auto;
+        padding:var(--gap);
+        display:grid;
+        gap:var(--gap);
+    }
+    .card{
+        background:var(--bg-secondary);
+        border:1px solid var(--border-color);
+        border-radius:var(--radius);
+        padding:20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .row{display:flex;flex-wrap:wrap;gap:var(--gap);align-items:center}
+    label{font-size:14px;opacity:.9;margin-bottom:4px;display:block}
+    input[type="file"], select, button {
+        padding:12px 16px;
+        border-radius:10px;
+        border:1px solid var(--border-color);
+        background:var(--bg-primary);
+        color:var(--text-color);
+        font-size:16px;
+        transition: all 0.2s ease-in-out;
+    }
+    input[type="file"]::file-selector-button {
+        background-color: var(--accent-blue);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 10px;
+        transition: background-color 0.2s ease-in-out;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background-color: var(--accent-blue-dark);
+    }
+    button{
+        cursor:pointer;
+        font-weight:600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    button.primary{
+        background:var(--accent-blue);
+        border-color:var(--accent-blue-dark);
+        color: white;
+    }
+    button.primary:hover:not(:disabled){
+        background:var(--accent-blue-dark);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+    button:disabled{opacity:.6;cursor:not-allowed}
+    img.preview{
+        max-width:100%;
+        height:auto;
+        border-radius:10px;
+        border:1px solid var(--border-color);
+        background:var(--bg-primary);
+        min-height: 150px; 
+        display: block;
+        object-fit: contain;
+    }
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{border-bottom:1px solid var(--border-color);padding:10px 8px;font-size:15px;text-align:left}
+    th{font-weight: 700; color: var(--text-muted);}
+    .muted{opacity:.8;font-size:14px; color: var(--text-muted);}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+    .grid-3{display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--gap)}
+    @media (max-width: 900px){.grid-2, .grid-3{grid-template-columns:1fr}}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+    .pill{
+        display:inline-block;
+        padding:4px 10px;
+        border:1px solid;
+        border-radius:999px;
+        font-size:12px;
+        margin-left:10px;
+        font-weight:600;
+        text-transform: uppercase;
+    }
+    .ok{color:var(--success-green);border-color:#065f46}
+    .warn{color:var(--warning-orange);border-color:#7c2d12}
+    .err{color:var(--error-red);border-color:#7f1d1d}
+    .confidence-high { color: var(--success-green); }
+    .confidence-low { color: var(--warning-orange); }
+
+    .loading-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--accent-blue);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+        display: none; 
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .btn-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .gemini-details-section {
+      margin-top: var(--gap);
+    }
+    .gemini-details-section h3 {
+      color: var(--accent-blue);
+      margin-bottom: 15px;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 8px;
+    }
+    .gemini-detail-card {
+        min-height: 180px; 
+        display: flex;
+        flex-direction: column;
+    }
+    .gemini-detail-card h4 {
+        color: var(--text-color);
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+    .gemini-detail-card p {
+        margin-bottom: 0;
+        font-size: 15px;
+        color: var(--text-muted);
+        flex-grow: 1; 
+        overflow-y: auto; 
+        padding-right: 5px; 
+    }
+    .gemini-no-details-message {
+      grid-column: 1 / -1; 
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="margin:0;font-size:24px;display:flex;align-items:center;gap:10px">
+      Uvas API Demo <span id="health-pill" class="pill muted">health...</span>
+    </h1>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="row" style="justify-content:space-between">
+        <div style="flex-grow: 1;">
+          <label for="model">Modelo de Predicción</label>
+          <select id="model">
+            <option value="inception">Inception (256x256)</option>
+            <option value="baseline">Baseline (256x256)</option>
+          </select>
+        </div>
+        <div style="flex-grow: 2;">
+          <label for="file">Seleccionar Imagen (JPG/PNG)</label>
+          <input id="file" type="file" accept="image/*" />
+        </div>
+        <div class="row" style="margin-left: auto;">
+          <button id="btn-analyze" class="primary">
+            <span class="btn-content">
+                <span class="loading-spinner"></span>
+                <span id="analyze-button-text">Analizar</span>
+            </span>
+          </button>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:15px; text-align: center;">
+        Selecciona un modelo, sube una imagen de una hoja de uva y presiona <b>Analizar</b> para obtener un diagnóstico.
+      </p>
+    </section>
+
+    <section class="grid-2">
+
+      <div class="card">
+        <h3>Vista Previa de la Imagen</h3>
+        <img id="preview" class="preview" alt="Imagen de vista previa" />
+      </div>
+
+
+      <div class="card">
+        <h3>Resultado del Análisis</h3>
+        <div id="model-info"></div>
+        <div id="final-result" style="font-weight: bold; font-size: 1.4em; margin-top: 8px;">Aún sin análisis…</div>
+        <div id="confidence-info" class="muted" style="margin-top: 4px;"></div>
+        <div id="probs" style="margin-top: 15px;"></div>
+      </div>
+    </section>
+    
+
+    <section id="gemini-details-section" class="gemini-details-section" style="display:none;">
+        <h3 id="gemini-details-title">Detalles de la Enfermedad (con IA de Gemini)</h3>
+        <div id="gemini-detail-cards-grid" class="grid-3">
+            <div id="symptoms-card" class="card gemini-detail-card" style="display:none;">
+                <h4>Síntomas</h4>
+                <p id="symptoms-text" class="muted"></p>
+            </div>
+            <div id="cure-card" class="card gemini-detail-card" style="display:none;">
+                <h4>Cura</h4>
+                <p id="cure-text" class="muted"></p>
+            </div>
+            <div id="prevention-card" class="card gemini-detail-card" style="display:none;">
+                <h4>Prevención</h4>
+                <p id="prevention-text" class="muted"></p>
+            </div>
+            <div id="gemini-no-details-message" class="card gemini-no-details-message" style="display:none;">
+              <p class="muted" style="margin: 0;">
+                <i>No hay detalles adicionales disponibles (baja confianza, indeterminado o "Healthy").</i>
+              </p>
+            </div>
+        </div>
+    </section>
+
+  </main>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const modelSel = $('#model');
+    const fileInp  = $('#file');
+    const btnGo    = $('#btn-analyze');
+    const preview  = $('#preview');
+    const modelInfoEl = $('#model-info');
+    const finalResultEl = $('#final-result');
+    const confidenceInfoEl = $('#confidence-info');
+    const probsEl  = $('#probs');
+    const healthPill = $('#health-pill');
+    const loadingSpinner = $('.loading-spinner'); 
+    const analyzeButtonText = $('#analyze-button-text'); 
+
+
+    const geminiDetailsSection = $('#gemini-details-section'); 
+    const geminiDetailsTitle = $('#gemini-details-title');
+    const symptomsCard = $('#symptoms-card');
+    const symptomsText = $('#symptoms-text');
+    const cureCard = $('#cure-card');
+    const cureText = $('#cure-text');
+    const preventionCard = $('#prevention-card');
+    const preventionText = $('#prevention-text');
+    const geminiNoDetailsMessage = $('#gemini-no-details-message');
+
+
+
+    (async () => {
+      try {
+        const r = await fetch('/health');
+        const j = await r.json();
+        const ok = j.labels_exists && Object.values(j.models).every(m => m.model_exists);
+        healthPill.textContent = ok ? 'OK' : 'WARN';
+        healthPill.classList.add(ok ? 'ok' : 'warn');
+        healthPill.title = JSON.stringify(j, null, 2);
+      } catch (e) {
+        healthPill.textContent = 'ERR';
+        healthPill.classList.add('err');
+      }
+    })();
+
+
+    fileInp.addEventListener('change', () => {
+      const f = fileInp.files?.[0];
+      if (!f) { preview.removeAttribute('src'); preview.alt = "Sin imagen"; return; }
+      const url = URL.createObjectURL(f);
+      preview.src = url;
+      preview.alt = "Vista previa de la imagen seleccionada";
+    });
+
+
+    function renderProbs(map) {
+      if (!map) { probsEl.innerHTML = ''; return; }
+      const rows = Object.entries(map)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([k,v]) => `<tr><td>${k}</td><td>${(v*100).toFixed(2)}%</td></tr>`)
+        .join('');
+      probsEl.innerHTML = `
+        <table>
+          <thead><tr><th>Clase</th><th>Prob.</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+
+    function hideGeminiDetails() {
+        geminiDetailsSection.style.display = 'none';
+        symptomsCard.style.display = 'none';
+        cureCard.style.display = 'none';
+        preventionCard.style.display = 'none';
+        geminiNoDetailsMessage.style.display = 'none';
+        symptomsText.innerHTML = ''; 
+        cureText.innerHTML = '';
+        preventionText.innerHTML = '';
+    }
+
+
+    function showGeminiDetails(details) {
+        geminiDetailsSection.style.display = 'block'; 
+
+        if (details && details.symptoms && details.cure && details.symptoms !== "No disponible." &&
+            details.cure !== "No disponible." && details.prevention !== "No disponible." &&
+            !details.symptoms.includes("Error al consultar Gemini") && !details.cure.includes("Error al consultar Gemini") && !details.prevention.includes("Error al consultar Gemini")) {
+            
+            symptomsText.innerHTML = details.symptoms.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            cureText.innerHTML = details.cure.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            preventionText.innerHTML = details.prevention.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+
+            symptomsCard.style.display = 'flex'; 
+            cureCard.style.display = 'flex';
+            preventionCard.style.display = 'flex';
+            geminiNoDetailsMessage.style.display = 'none';
+        } else {
+            symptomsCard.style.display = 'none';
+            cureCard.style.display = 'none';
+            preventionCard.style.display = 'none';
+            geminiNoDetailsMessage.style.display = 'block'; 
+        }
+    }
+
+
+
+    btnGo.addEventListener('click', async () => {
+      const f = fileInp.files?.[0];
+      const model = modelSel.value;
+      if (!f) { alert('Por favor, selecciona una imagen para analizar.'); return; }
+
+      btnGo.disabled = true;
+      analyzeButtonText.textContent = 'Cargando...'; 
+      loadingSpinner.style.display = 'inline-block'; 
+
+      modelInfoEl.innerHTML = '';
+      finalResultEl.textContent = 'Procesando imagen...'; 
+      finalResultEl.className = '';
+      confidenceInfoEl.textContent = '';
+      probsEl.innerHTML = '';
+      hideGeminiDetails(); 
+
+      try {
+        const form = new FormData();
+        form.append('file', f);
+        const resp = await fetch(`/predict?model=${encodeURIComponent(model)}`, { method:'POST', body: form });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          finalResultEl.textContent = `Error: ${data?.error || resp.statusText}`;
+          finalResultEl.classList.add('err');
+          renderProbs(null);
+          return;
+        }
+
+        modelInfoEl.innerHTML = `<strong>Modelo usado:</strong> ${data.model}`;
+
+        let predictionText = data.final_prediction_message;
+        let confidenceClass = '';
+        let confidenceMessage = '';
+
+        if (data.confidence_level === 'high') {
+            confidenceClass = 'confidence-high';
+            confidenceMessage = `(Confianza: ${(data.max_probability * 100).toFixed(2)}%)`;
+        } else {
+            confidenceClass = 'confidence-low';
+            predictionText = `Indeterminado (Baja Confianza)`;
+            confidenceMessage = `(Probabilidad máxima: ${(data.max_probability * 100).toFixed(2)}%)`;
+        }
+        
+        finalResultEl.innerHTML = `Resultado: <span class="${confidenceClass}">${predictionText}</span>`;
+        confidenceInfoEl.textContent = confidenceMessage;
+        confidenceInfoEl.className = `muted ${confidenceClass}`;
+
+        renderProbs(data.probabilities);
+
+
+        showGeminiDetails(data.disease_details);
+
+      } catch (e) {
+        finalResultEl.textContent = `Error inesperado: ${e.message}`;
+        finalResultEl.classList.add('err');
+        renderProbs(null);
+        
+        geminiDetailsSection.style.display = 'block';
+        geminiNoDetailsMessage.innerHTML = `<p class="muted" style="text-align: center; margin: 0; color: var(--error-red);"><i>Hubo un problema al cargar la información de la enfermedad: ${e.message}</i></p>`;
+        geminiNoDetailsMessage.style.display = 'block';
+        symptomsCard.style.display = 'none'; cureCard.style.display = 'none'; preventionCard.style.display = 'none';
+
+      } finally {
+        btnGo.disabled = false;
+        analyzeButtonText.textContent = 'Analizar';
+        loadingSpinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
